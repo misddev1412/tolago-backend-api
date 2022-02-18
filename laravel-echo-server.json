@@ -1,0 +1,37 @@
+{
+    "authHost": "http://0.0.0.0:8001",
+    "authEndpoint": "/api/v1/broadcasting/auth",
+    "clients": [
+        {
+            "appId": "123123123",
+            "key": "xzxzxcsa"
+        }
+    ],
+    "database": "redis",
+    "databaseConfig": {
+        "redis": {
+            "port": 6379,
+            "host": "0.0.0.0"
+        },
+        "sqlite": {
+            "databasePath": "/database/laravel-echo-server.sqlite"
+        }
+    },
+    "devMode": true,
+    "host": null,
+    "port": "6001",
+    "protocol": "http",
+    "socketio": {},
+    "secureOptions": 67108864,
+    "sslCertPath": "",
+    "sslKeyPath": "",
+    "sslCertChainPath": "",
+    "sslPassphrase": "",
+    "subscribers": {
+        "http": true,
+        "redis": true
+    },
+    "apiOriginAllow": {
+        "allowCors": false
+    }
+}
