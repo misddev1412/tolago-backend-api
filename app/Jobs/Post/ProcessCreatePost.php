@@ -75,7 +75,6 @@ class ProcessCreatePost implements ShouldQueue
                 'meta_description' => $this->request['meta_description'] ?? '',
                 'meta_keywords' => $this->request['meta_keywords']  ?? '',
                 'featured' => $this->request['featured'] ?? 0,
-                'image' => null,
                 'type' => $this->request['type'] ?? 'user_post',
                 
             ];
@@ -103,7 +102,7 @@ class ProcessCreatePost implements ShouldQueue
                 $postService = new PostService($post);
                 $postService->cacheSinglePost();
 
-                Log::info(User::first()->name . ' created a new post: ' . $post->title);
+                Log::info(User::first()->fullname . ' created a new post: ' . $post->title);
                 Notification::send(User::first(), new NewPost($post));
 
                 $this->request['locale'] = $this->locale;

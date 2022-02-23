@@ -3,8 +3,9 @@
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
-
-class UpdateProfileRequest extends FormRequest
+use App\Http\Requests\BaseRequest;
+use Auth;
+class UpdateProfileRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +14,7 @@ class UpdateProfileRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return true;
     }
 
     /**
@@ -24,7 +25,10 @@ class UpdateProfileRequest extends FormRequest
     public function rules()
     {
         return [
-            //
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
+            'avatar' => 'mimes:jpg,png|max:2048|nullable',
+            'email' => 'string|email|max:255|unique:users,email,' . Auth::guard('api')->user()->id,
         ];
     }
 }

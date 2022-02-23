@@ -18,8 +18,6 @@ class PostService
     //cache single post
     public function cacheSinglePost()
     {
-
-
         if ($this->post) {
 
             if(Cache::has("posts.{$this->post->id}")) {

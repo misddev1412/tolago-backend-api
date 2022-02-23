@@ -39,7 +39,8 @@ class UserSetting extends Model
         'search_by_phone',
         'can_find_me',
         'can_access_closed_profile',
-        'friend_privacy'
+        'friend_privacy',
+        'is_enable_2fa'
 
     ];
 

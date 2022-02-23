@@ -85,7 +85,7 @@ class ProcessUpdatePost implements ShouldQueue
                 $postService = new PostService($post);
                 $postService->cacheSinglePost();
 
-                Log::info(User::first()->name . ' updated post: ' . $post->title);
+                Log::info(User::first()->fullname . ' updated post: ' . $post->title);
                 Notification::send(User::first(), new NewPost($post));
                 if ($this->imageFileTmp) {
                     ProcessImage::dispatch($this->imageFileTmp, $this->userId, 'post', $post->id, $this->ip, $this->userAgent);

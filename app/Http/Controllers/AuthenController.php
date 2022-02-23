@@ -12,6 +12,12 @@ use Auth;
 use Illuminate\Support\Facades\Broadcast;
 use App\Jobs\Auth\ProcessSignup;
 use App\Jobs\Auth\ProcessSignin;
+use App\Jobs\Auth\ProcessUpdateProfile;
+use App\Jobs\Auth\ProcessEnableQrCode;
+use App\Http\Requests\Auth\UpdateProfileRequest;
+use App\Http\Requests\Auth\EnableQrCodeRequest;
+use Storage;
+use App\Repositories\User\UserRepositoryInterface;
 
 class AuthenController extends Controller
 {
@@ -19,10 +25,12 @@ class AuthenController extends Controller
     protected $user;
 
     //construct with model user instance
-    public function __construct(User $user)
+    public function __construct(User $user, UserRepositoryInterface $userRepository)
     {
         $this->user = $user;
+        $this->userRepository = $userRepository;
     }
+
 
     //login function return generateResponse
     public function login(Request $request)
@@ -41,7 +49,7 @@ class AuthenController extends Controller
             $authToken = $auth->createToken('MyApp');
             $dataResponse = [
                 'id' => $auth->id,
-                'name' => $auth->name,
+                'name' => $auth->fullname,
                 'token' => $authToken->accessToken,
                 'expires_at' => $authToken->token->expires_at,
                 'token_type' => 'Bearer',
@@ -60,10 +68,11 @@ class AuthenController extends Controller
         $signupData = [
             'email' => $request->email,
             'password' => bcrypt($request->password),
-            'name' => $request->name,
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
         ];
 
-        ProcessSignup::dispatch($signupData, $request->except('password', 'retype_password'), Helper::getClientIps(), Helper::getClientAgent());
+        ProcessSignup::dispatch($signupData, $request->except('password', 'retype_password'), $this->userRepository, Helper::getClientIps(), Helper::getClientAgent());
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
     }
 
@@ -94,7 +103,7 @@ class AuthenController extends Controller
 
         $dataResponse = [
             'id' => $auth->id,
-            'name' => $auth->name,
+            'name' => $auth->fullname,
             'token' => $authToken->accessToken,
             'expires_at' => $authToken->token->expires_at,
             'token_type' => 'Bearer',
@@ -104,11 +113,50 @@ class AuthenController extends Controller
     }
 
     //update profile function
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateProfileRequest $request)
     {
         $user = Auth::guard('api')->user();
-        $user->name = $request->name;
-        $user->save();
-        return Response::generateResponse(HttpStatusCode::OK, '', $user);
+        if (!$user) {
+            return Response::generateResponse(HttpStatusCode::UNAUTHORIZED, '', '');
+        }
+        $fileName = '';
+        if ($request->file('avatar')) {
+            $file = $request->file('avatar');
+            $fileName = Storage::disk('local')->put('tmp/images', $file);
+        }
+
+        $dataUpdate = [
+            'first_name' => $request->first_name,
+            'last_name' => $request->last_name,
+        ];
+
+        ProcessUpdateProfile::dispatch(Auth::guard('api')->user()->id, $dataUpdate, $fileName, Helper::getClientIps(), Helper::getClientAgent());
+        return Response::generateResponse(HttpStatusCode::OK, '', []);
+    }
+
+    public function createQrUrl() 
+    {
+        $googleAuthenticator = new \PHPGangsta_GoogleAuthenticator();
+        $secretCode = $googleAuthenticator->createSecret();
+        $qrCodeUrl = $googleAuthenticator->getQRCodeGoogleUrl(
+            Auth::guard('api')->user()->email, $secretCode, config("app.name")
+        );
+        User::where('id', Auth::guard('api')->user()->id)->update(['secret_code' => $secretCode]);
+        return Response::generateResponse(HttpStatusCode::OK, '', [
+            'qr_code_url' => $qrCodeUrl
+        ]);
+    }
+
+    public function enableQrCode(EnableQrCodeRequest $request) 
+    {
+        $googleAuthenticator = new \PHPGangsta_GoogleAuthenticator();
+        $secretCode = Auth::guard('api')->user()->secret_code;
+        $checkCode = $googleAuthenticator->verifyCode($secretCode, $request->otp, 0);
+        if ($checkCode) {
+            ProcessEnableQrCode::dispatch(Auth::guard('api')->user()->id, Helper::getClientIps(), Helper::getClientAgent());
+            return Response::generateResponse(HttpStatusCode::OK, '', []);
+        } else {
+            return Response::generateResponse(HttpStatusCode::UNAUTHORIZED, __('OTP is not valid.'), '');
+        }
     }
 }

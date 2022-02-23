@@ -22,6 +22,7 @@ class ProcessImage implements ShouldQueue
     protected $objectId;
     protected $ip;
     protected $userAgent;
+    protected $mainImage;
 
     
     /**
@@ -29,13 +30,14 @@ class ProcessImage implements ShouldQueue
      *
      * @return void
      */
-    public function __construct($fileName, $userId, $table, $objectId, $ip, $userAgent) {
+    public function __construct($fileName, $userId, $table, $objectId, $ip, $userAgent, $mainImage = true) {
         $this->fileName = $fileName;
         $this->userId = $userId;
         $this->table = $table;
         $this->objectId = $objectId;
         $this->ip = $ip;
         $this->userAgent = $userAgent;
+        $this->mainImage = $mainImage;
     }
 
 
@@ -46,7 +48,7 @@ class ProcessImage implements ShouldQueue
      */
     public function handle()
     {
-        $media = MediaService::commonImage($this->fileName, $this->userId, $this->table, $this->objectId);
+        $media = MediaService::commonImage($this->fileName, $this->userId, $this->table, $this->objectId, $this->mainImage);
         $activityLogService = new ActivityLogService();
         $activityLogService->createActivityLog($this->userId, 'upload_image', $media->id, 'images', 'success', [$this->fileName], $this->ip, $this->userAgent);
 

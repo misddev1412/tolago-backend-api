@@ -57,7 +57,7 @@ class ProcessPostTranslation implements ShouldQueue
                 $postService->cacheSinglePost();
                 $postService->createTranslations($post->id, $this->request);
 
-                Log::info(User::first()->name . ' created a new post: ' . $post->title);
+                Log::info(User::first()->fullname . ' created a new post: ' . $post->title);
                 Notification::send(User::first(), new NewPost($post));
             }
         } catch (Exception $e) {

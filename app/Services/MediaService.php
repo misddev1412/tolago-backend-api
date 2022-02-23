@@ -11,12 +11,17 @@ use Storage;
 use Illuminate\Http\File;
 use App\Models\ImagePost;
 use App\Models\ImageMessage;
+use App\Models\ImageUser;
+use App\Models\ImageHotel;
+use App\Models\User;
+use App\Models\Hotel;
 
 class MediaService
 {
-    public static function commonImage($imageFile, $userId, $table, $objectId): ImageModel
+    public static function commonImage($imageFile, $userId, $table, $objectId, $mainImage = true): ImageModel
     {
         $imagePath  = storage_path() . '//app/' . $imageFile;
+        \Log::info($imagePath);
         $extension = pathinfo($imageFile, PATHINFO_EXTENSION);
         
         $directory = storage_path() . '//app/public/images/' . $userId . '/';
@@ -87,12 +92,29 @@ class MediaService
                         'image_id' => $image->id,
                         'post_id' => $objectId,
                     ]);
+                    Post::where('id', $objectId)->update(['image_id' => $image->id]);
                     break;
                 case 'message':
                     ImageMessage::create([
                         'image_id' => $image->id,
                         'message_id' => $objectId,
                     ]);
+                    break;
+                case 'user':
+                    ImageUser::create([
+                        'image_id' => $image->id,
+                        'user_id' => $objectId,
+                    ]);
+                    User::where('id', $objectId)->update(['image_id' => $image->id]);
+                    break;
+                case 'hotel':
+                    ImageHotel::create([
+                        'image_id' => $image->id,
+                        'hotel_id' => $objectId,
+                    ]);
+                    if ($mainImage) {
+                        Hotel::where('id', $objectId)->update(['image_id' => $image->id]);
+                    }
                     break;
             }   
         }

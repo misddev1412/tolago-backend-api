@@ -180,7 +180,9 @@ return [
         App\Providers\PermissionsServiceProvider::class,
         App\Providers\RepositoryServiceProvider::class,
         Intervention\Image\ImageServiceProvider::class,
-        Kreait\Laravel\Firebase\ServiceProvider::class
+        Kreait\Laravel\Firebase\ServiceProvider::class,
+        Laravel\Socialite\SocialiteServiceProvider::class,
+
 
     ],
 
@@ -198,7 +200,9 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         // ...
         'Image' => Intervention\Image\Facades\Image::class,
-        'Helper' => App\Helpers\Helper::class
+        'Helper' => App\Helpers\Helper::class,
+        'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+
     ])->toArray(),
 
 ];

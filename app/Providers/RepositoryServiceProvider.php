@@ -15,8 +15,24 @@ class RepositoryServiceProvider extends ServiceProvider
     {
         //register post repository
         $this->app->bind(
-            'App\Repositories\PostRepositoryInterface',
-            'App\Repositories\PostRepository'
+            'App\Repositories\Post\PostRepositoryInterface',
+            'App\Repositories\Post\PostRepository'
+        );
+        //register repository roles
+        $this->app->bind(
+            'App\Repositories\Role\RoleRepositoryInterface',
+            'App\Repositories\Role\RoleRepository'
+        );
+        //register repository user
+        $this->app->bind(
+            'App\Repositories\User\UserRepositoryInterface',
+            'App\Repositories\User\UserRepository'
+        );
+
+        //register repository hotel
+        $this->app->bind(
+            'App\Repositories\Hotel\HotelRepositoryInterface',
+            'App\Repositories\Hotel\HotelRepository'
         );
 
     }

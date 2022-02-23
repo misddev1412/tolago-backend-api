@@ -22,16 +22,20 @@ class ProcessCreateMessage implements ShouldQueue
 
     private $dataCreate;
     private $files;
+    private $ip;
+    private $userAgent;
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($dataCreate, $files)
+    public function __construct($dataCreate, $files, $ip, $userAgent)
     {
         //
         $this->dataCreate = $dataCreate;
         $this->files = $files;
+        $this->ip = $ip;
+        $this->userAgent = $userAgent;
     }
 
     /**
@@ -45,7 +49,7 @@ class ProcessCreateMessage implements ShouldQueue
 
         foreach ($this->files as $file) {
             if ($file) {
-                ProcessImage::dispatch($file, $this->dataCreate['sender_id'], 'message', $message->id, Helper::getUserIp(), Helper::getUserAgent());
+                ProcessImage::dispatch($file, $this->dataCreate['sender_id'], 'message', $message->id, $this->ip, $this->userAgent);
 
             }
         }

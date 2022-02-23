@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Services\FirebaseService;
 use App\Models\Message;
 use App\Helpers\Response;
+use App\Helpers\Helper;
 use App\Enum\HttpStatusCode;
 use Gate;
 use Auth;
@@ -26,7 +27,6 @@ class ChatController extends Controller
     public function chat() {
         $firebase = new FirebaseService();
         $database = $firebase->database();
-        dd('s');
         return response()->json($value);
     }
 
@@ -51,7 +51,7 @@ class ChatController extends Controller
             }
         }
 
-        ProcessCreateMessage::dispatch($dataCreate, $fileNames);
+        ProcessCreateMessage::dispatch($dataCreate, $fileNames, Helper::getClientIps(), Helper::getClientAgent());
 
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
     }

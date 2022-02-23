@@ -1,27 +1,26 @@
 <?php 
 
-namespace App\Repositories;
+namespace App\Repositories\Hotel;
 
 /**
  * Interface GalleryRepositoryInterface
  * @package App\Repositories
  */
-use App\Models\Post;
+use App\Models\Hotel;
 
-use App\Repositories\PostRepositoryInterface;
+use App\Repositories\Hotel\HotelRepositoryInterface;
 use Cache;
-use App\Services\PostService;
-use App\Jobs\Post\ProcessCachePost;
+use App\Services\HoteLService;
 use Illuminate\Http\Request;
-class PostRepository implements PostRepositoryInterface
+class HotelRepository implements HotelRepositoryInterface
 {
 
-    private $post;
+    private $hotel;
 
     //constructor with Post model
-    public function __construct(Post $post)
+    public function __construct(Hotel $hotel)
     {
-        $this->post = $post;
+        $this->hotel = $hotel;
     }
 
     /**
@@ -30,42 +29,39 @@ class PostRepository implements PostRepositoryInterface
      */
     public function findOrFailWithAll($id)
     {
-        $data = Cache::get("posts.{$id}");
+        $data = Cache::get("hotels.{$id}");
         if (!$data) {
-            $data = $this->post->findOrFailWithAll($id);
-            $postService = new PostService($data);
-            $postService->cacheSinglePost();
+            $data = $this->hotel->findOrFailWithAll($id);
+            $hotelService = new HotelService($data);
+            $hotelService->cacheSingleHotel();
         }
         return $data; 
     }
 
     //index function
-    public function index(Request $request, $viewFull = false)
+    public function index(Request $request)
     {
         $perPage    = $request->get('per_page', 10);
         $page       = $request->get('page', 1);
 
-        if ($request->title) {
-            $posts = $this->post->search($request->title, function ($search, string $query, array $options) use ($perPage, $page, $viewFull) {
+        if ($request->keyword) {
+            $hotels = $this->hotel->search($request->keyword, function ($search, string $query, array $options) use ($perPage, $page) {
                 $options = [
                     'sort' => ['created_at:desc'],
                     'limit' => $perPage,
                     'offset' => $perPage * ($page - 1),
                 ];
 
-                if (!$viewFull) {
-                    $options['filter'] = ['status = 1'];
-                }
-    
                 return $search->search($query, $options);
             })->where('user_id', 1)->paginate($perPage);
         } else {
-            $posts = $this->post->orderBy('created_at', 'desc')->paginate($perPage);
+            $hotels = $this->hotel->orderBy('created_at', 'desc')->paginate($perPage);
         }
 
-        $posts->load('user');
-        $posts->load('translationCurrentLanguage');
-        return $posts;
+        $hotels->load('user');
+        $hotels->load('country');
+        $hotels->load('translationCurrentLanguage');
+        return $hotels;
     }
 
     //auto complete function
@@ -74,17 +70,17 @@ class PostRepository implements PostRepositoryInterface
         $perPage    = $request->get('per_page', 5);
         $page       = $request->get('page', 1);
 
-        if ($request->title) {
-            $posts = $this->getDataSearchSugesstion($request->title, $perPage, $page);
+        if ($request->keyword) {
+            $hotels = $this->getDataSearchSugesstion($request->keyword, $perPage, $page);
         } else {
-            $posts = $this->post->orderBy('created_at', 'desc')->paginate($perPage);
+            $hotels = $this->hotel->orderBy('created_at', 'desc')->paginate($perPage);
         }
 
-        $data = $posts->pluck('title')->unique()->toArray();
+        $data = $hotels->pluck('name')->unique()->toArray();
         for ($i = 0; $i < $perPage; $i++) {
             if (count($data) < $perPage) {
                 // dd($this->getDataSearchSugesstion($request->title, $perPage, $page + 1));
-                $dataMerge = $this->getDataSearchSugesstion($request->title, $perPage, $page + 1)->pluck('title')->unique()->toArray();
+                $dataMerge = $this->getDataSearchSugesstion($request->keyword, $perPage, $page + 1)->pluck('name')->unique()->toArray();
                 $data = array_merge($data, $dataMerge);
             } else {
                 break;
@@ -94,8 +90,8 @@ class PostRepository implements PostRepositoryInterface
         return array_unique($data);
     }
 
-    private function getDataSearchSugesstion($title, $perPage, $page) {
-        $posts = $this->post->search($title, function ($search, string $query, array $options) use ($perPage, $page) {
+    private function getDataSearchSugesstion($name, $perPage, $page) {
+        $hotels = $this->hotel->search($name, function ($search, string $query, array $options) use ($perPage, $page) {
             $options = [
                 'sort' => ['created_at:desc'],
                 'limit' => $perPage,
@@ -104,6 +100,6 @@ class PostRepository implements PostRepositoryInterface
             return $search->search($query, $options);
         })->paginate($perPage);
         
-        return $posts;
+        return $hotels;
     }
 }

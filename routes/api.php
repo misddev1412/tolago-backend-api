@@ -8,6 +8,11 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\FriendController;
 use App\Http\Controllers\EventStreamController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\RoleController;
+use App\Http\Controllers\HotelController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\SocialAccountController;
+use App\Http\Controllers\AddressController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -31,6 +36,7 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
     Route::post('post/translation/{id}', [PostController::class, 'translation']);
     Route::get('post/search/suggestion', [PostController::class, 'autocomplete']);
     Route::apiResource('post', PostController::class);
+    Route::apiResource('hotel', HotelController::class);
 
     Route::apiResource('category', CategoryController::class);
 
@@ -42,6 +48,17 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
     Route::post('logout', [AuthenController::class, 'logout']);
 
     Route::post('friend/invite/{id}', [FriendController::class, 'sendInvite']);
+
+    Route::get('auth/create-qr-url', [AuthenController::class, 'createQrUrl']);
+    Route::post('auth/enable-qr-url', [AuthenController::class, 'enableQrCode']);
+    Route::put('auth/update-profile', [AuthenController::class, 'updateProfile']);
+    
+    Route::get('address/lat-lang-from-address', [AddressController::class, 'getLatAndLangFromAddress']);
+});
+
+Route::group(['prefix' => 'v1/admin', 'middleware' => ['auth:api', 'admin']], function () {
+    Route::apiResource('role', RoleController::class);
+    Route::apiResource('user', UserController::class);
 });
 
 //routes v1 for AuthenController
@@ -49,5 +66,8 @@ Route::prefix('v1')->group(function () {
     Route::post('login', [AuthenController::class, 'login']);
     Route::post('signup', [AuthenController::class, 'signup']);
     Route::get('/event-stream-notification', [EventStreamController::class, 'getEventStreamNotification']);
+
+    Route::get('login/{social}', [SocialAccountController::class, 'redirectToProvider']);
+    Route::get('login/{social}/callback', [SocialAccountController::class, 'handleProviderCallback']);
 
 });

@@ -18,7 +18,7 @@ use App\Jobs\Post\ProcessPostTranslation;
 use Gate;
 use Lang;
 use App\Services\MediaService;
-use App\Repositories\PostRepositoryInterface;
+use App\Repositories\Post\PostRepositoryInterface;
 use App\Helpers\Helper;
 
 
@@ -110,7 +110,7 @@ class PostController extends Controller
         }
 
 
-        if (!Auth::guard('api')->user()->role == 'admin' || !Gate::forUser(Auth::guard('api')->user())->denies('create-system-post', $post)) {
+        if (!Auth::guard('api')->user()->hasRole('admin') || !Gate::forUser(Auth::guard('api')->user())->denies('create-system-post', $post)) {
             $request = $request->except('type', 'image');
         } else {
             $request = $request->except('image');

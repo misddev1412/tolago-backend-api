@@ -41,7 +41,22 @@ return new class extends Migration
     public function down()
     {
         Schema::table('users', function (Blueprint $table) {
-            //
+            $table->dropColumn('image_id');
+            $table->dropColumn('status');
+            $table->dropColumn('slug');
+            $table->dropColumn('phone_number');
+            $table->dropColumn('is_phone_verified');
+            $table->dropColumn('facebook_id');
+            $table->dropColumn('google_id');
+            $table->dropColumn('twitter_id');
+            $table->dropColumn('linkedin_id');
+            $table->dropColumn('qr_code');
+            $table->dropColumn('cover_image');
+            $table->dropColumn('username');
+            $table->dropColumn('display_name');
+            $table->dropColumn('birthday');
+            $table->dropColumn('gender');
+            $table->dropColumn('address_book_id');
         });
     }
 };

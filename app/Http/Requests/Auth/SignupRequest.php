@@ -28,7 +28,8 @@ class SignupRequest extends BaseRequest
             //rules for create user
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'name' => 'required|string|max:255',
+            'first_name' => 'required|string|max:255',
+            'last_name' => 'required|string|max:255',
             'retype_password' => 'required|same:password',
         ];
     }
