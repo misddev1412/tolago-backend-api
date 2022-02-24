@@ -5,7 +5,7 @@ namespace App\Http\Requests\Room;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Http\Requests\BaseRequest;
 
-class UpdateRoomRequest extends BaseRequest
+class UpdatePriceRequest extends BaseRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -25,7 +25,9 @@ class UpdateRoomRequest extends BaseRequest
     public function rules()
     {
         return [
-            //
+            'price' => 'required|numeric',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date|after:start_date',
         ];
     }
 }

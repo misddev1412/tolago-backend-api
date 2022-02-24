@@ -5,17 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Utility extends Model
+class ImageRoom extends Model
 {
     use HasFactory;
-    protected $table = 'utilities';
+    protected $table = 'image_room';
     protected $fillable = [
-        'name', 
-        'description', 
         'image_id', 
-        'type', 
-        'status',
-        'user_id', 
+        'room_id', 
         'created_at',
         'updated_at',
     ];

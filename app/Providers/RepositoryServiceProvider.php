@@ -35,6 +35,12 @@ class RepositoryServiceProvider extends ServiceProvider
             'App\Repositories\Hotel\HotelRepository'
         );
 
+        //register repository room
+        $this->app->bind(
+            'App\Repositories\Room\RoomRepositoryInterface',
+            'App\Repositories\Room\RoomRepository'
+        );
+
     }
 
     /**

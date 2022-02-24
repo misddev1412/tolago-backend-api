@@ -13,8 +13,10 @@ use App\Models\ImagePost;
 use App\Models\ImageMessage;
 use App\Models\ImageUser;
 use App\Models\ImageHotel;
+use App\Models\ImageRoom;
 use App\Models\User;
 use App\Models\Hotel;
+use App\Models\Room;
 
 class MediaService
 {
@@ -114,6 +116,15 @@ class MediaService
                     ]);
                     if ($mainImage) {
                         Hotel::where('id', $objectId)->update(['image_id' => $image->id]);
+                    }
+                    break;
+                case 'room':
+                    ImageRoom::create([
+                        'image_id' => $image->id,
+                        'room_id' => $objectId,
+                    ]);
+                    if ($mainImage) {
+                        Room::where('id', $objectId)->update(['image_id' => $image->id]);
                     }
                     break;
             }   
