@@ -83,4 +83,13 @@ class User extends Authenticatable
     {
         return $this->hasMany('App\Models\Voucher');
     }
+
+    public function image() {
+        return $this->belongsTo('App\Models\Image', 'image_id');
+    }
+
+    public function scopeWithAll($query)
+    {
+        return $query->with(['image', 'vouchers']);
+    }
 }

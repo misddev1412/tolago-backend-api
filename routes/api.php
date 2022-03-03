@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\SocialAccountController;
 use App\Http\Controllers\AddressController;
 use App\Http\Controllers\RoomController;
+use App\Http\Controllers\UtilityController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -39,6 +40,7 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
     Route::apiResource('post', PostController::class);
     Route::apiResource('hotel', HotelController::class);
     Route::apiResource('room', RoomController::class);
+    Route::apiResource('utility', UtilityController::class);
     Route::put('room/{id}/price', [RoomController::class, 'updatePrice']);
 
     Route::apiResource('category', CategoryController::class);

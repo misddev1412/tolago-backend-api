@@ -37,18 +37,18 @@ class ProcessCreatePost implements ShouldQueue
     protected $post;
     protected $request;
     protected $userId;
-    protected $imageFileTmp;
+    protected $images;
     protected $locale;
     protected $ip;
     protected $userAgent;
     protected $searchIndex = 'posts';
 
     //construct post model
-    public function __construct($userId, $request, $locale, $imageFileTmp, $ip, $userAgent)
+    public function __construct($userId, $request, $locale, $images, $ip, $userAgent)
     {
         $this->userId = $userId;
         $this->request = $request;
-        $this->imageFileTmp = $imageFileTmp;
+        $this->images = $images;
         $this->locale = $locale;
         $this->ip = $ip;
         $this->userAgent = $userAgent;
@@ -76,6 +76,7 @@ class ProcessCreatePost implements ShouldQueue
                 'meta_keywords' => $this->request['meta_keywords']  ?? '',
                 'featured' => $this->request['featured'] ?? 0,
                 'type' => $this->request['type'] ?? 'user_post',
+                'main_id' => 0
                 
             ];
     
@@ -96,8 +97,20 @@ class ProcessCreatePost implements ShouldQueue
 
                     $userCount->save();
                 }
+                $postChildren = [];
 
-                ProcessImage::dispatch($this->imageFileTmp, $this->userId, 'post', $post->id, $this->ip, $this->userAgent);
+                foreach ($this->images as $image) {
+                    $dataCreate['body'] = '';
+                    $dataCreate['main_id'] = $post->id;
+
+                    $postChildren[] = Post::create($dataCreate)->id;
+                }
+
+                $i = 0;
+                foreach ($this->images as $image) {
+                    ProcessImage::dispatch($image, $this->userId, 'post', $postChildren[$i], $this->ip, $this->userAgent);
+                    $i++;
+                }
 
                 $postService = new PostService($post);
                 $postService->cacheSinglePost();

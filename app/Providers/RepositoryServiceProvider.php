@@ -41,6 +41,12 @@ class RepositoryServiceProvider extends ServiceProvider
             'App\Repositories\Room\RoomRepository'
         );
 
+        //register repository utilities
+        $this->app->bind(
+            'App\Repositories\Utility\UtilityRepositoryInterface',
+            'App\Repositories\Utility\UtilityRepository'
+        );
+
     }
 
     /**

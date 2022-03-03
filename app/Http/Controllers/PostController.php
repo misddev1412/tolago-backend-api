@@ -75,15 +75,16 @@ class PostController extends Controller
         if (Gate::forUser(Auth::guard('api')->user())->denies('create-post')) {
             return Response::generateResponse(HttpStatusCode::FORBIDDEN, '', []);
         }
+        
+        $fileNames = [];
 
-        $file = $request->file('image');
-        $fileName = Storage::disk('local')->put('tmp/images', $file);
-
-        if (!Storage::disk('local')->exists($fileName)) {
-            return Response::generateResponse(HttpStatusCode::INTERNAL_SERVER_ERROR, '', []);
+        if ($request->file('files')) {
+            foreach($request->file('files') as $file) {
+                $fileNames[] = Storage::disk('local')->put('tmp/files', $file);
+            }
         }
 
-        ProcessCreatePost::dispatch(Auth::guard('api')->user()->id, $request->except('image'), Lang::getLocale(), $fileName, Helper::getClientIps(), Helper::getClientAgent());
+        ProcessCreatePost::dispatch(Auth::guard('api')->user()->id, $request->except('images'), Lang::getLocale(), $fileNames, Helper::getClientIps(), Helper::getClientAgent());
 
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
     } 

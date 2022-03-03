@@ -58,12 +58,13 @@ class PostRepository implements PostRepositoryInterface
                 }
     
                 return $search->search($query, $options);
-            })->where('user_id', 1)->paginate($perPage);
+            })->where('user_id', 1)->where('main_id', 0)->paginate($perPage);
         } else {
-            $posts = $this->post->orderBy('created_at', 'desc')->paginate($perPage);
+            $posts = $this->post->where('main_id', 0)->orderBy('created_at', 'desc')->paginate($perPage);
         }
-
-        $posts->load('user');
+        $posts->load('user.image');
+        $posts->load('images');
+        $posts->load('postChildren.image');
         $posts->load('translationCurrentLanguage');
         return $posts;
     }

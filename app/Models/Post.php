@@ -16,6 +16,7 @@ class Post extends Model
     //fillable fields for posts model with default values
     protected $fillable = [
         'title',
+        'main_id',
         'body',
         'user_id',
         'category_id',
@@ -26,6 +27,7 @@ class Post extends Model
         'meta_keywords',
         'featured',
         'image_id',
+        'video_id',
         'created_at',
         'updated_at',
     ];
@@ -182,7 +184,9 @@ class Post extends Model
     {
         $array = $this->only('title', 'status', 'featured');
         $array['created_at'] = $this->created_at->timestamp;
-        $array['translation'] = $this->translation->only('title', 'locale') ?? [];
+        if ($this->translation) {
+            $array['translation'] = $this->translation->only('title', 'locale') ?? [];
+        }
         return $array;
     }
 
@@ -192,4 +196,13 @@ class Post extends Model
         return $this->belongsToMany('App\Models\Image', 'image_post', 'post_id', 'image_id');
     }
 
+
+    public function postChildren()
+    {
+        return $this->hasMany('App\Models\Post', 'main_id');
+    }
+
+    public function image() {
+        return $this->belongsTo('App\Models\Image', 'image_id');
+    }
 }

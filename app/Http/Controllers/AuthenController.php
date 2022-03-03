@@ -85,7 +85,8 @@ class AuthenController extends Controller
     //me function
     public function me()
     {
-        return Response::generateResponse(HttpStatusCode::OK, '', Auth::guard('api')->user());
+        $user = User::withAll()->find(Auth::guard('api')->user()->id);
+        return Response::generateResponse(HttpStatusCode::OK, '', $user);
     }
 
     //logout function

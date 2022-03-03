@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use App\Policies\PostPolicy;
 use App\Policies\HotelPolicy;
 use App\Policies\RoomPolicy;
+use App\Policies\UtilityPolicy;
 
 class AuthServiceProvider extends ServiceProvider
 {
@@ -66,5 +67,14 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('view-room', [RoomPolicy::class, 'view']);
         Gate::define('view-all-room', [RoomPolicy::class, 'viewAny']);
         Gate::define('delete-room', [RoomPolicy::class, 'delete']);
+    }
+
+    //register utility policies
+    private function registerUtilityPolicies() {
+        Gate::define('create-utility', [UtilityPolicy::class, 'create']);
+        Gate::define('update-utility', [UtilityPolicy::class, 'update']);
+        Gate::define('view-utility', [UtilityPolicy::class, 'view']);
+        Gate::define('view-all-utility', [UtilityPolicy::class, 'viewAny']);
+        Gate::define('delete-utility', [UtilityPolicy::class, 'delete']);
     }
 }

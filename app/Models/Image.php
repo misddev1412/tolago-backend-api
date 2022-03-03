@@ -25,5 +25,29 @@ class Image extends Model
         return $this->belongsTo(User::class);
     }
 
-    
+    public function getDefaultAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['default'];
+    }
+
+    public function getThumbnailAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['thumbnail'];
+    }
+
+    public function getMediumAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['medium'];
+    }
+
+    public function getLargeAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['large'];
+    }
+
+    public function getOriginalAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['original'];
+    }    
+
 }

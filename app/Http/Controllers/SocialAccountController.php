@@ -25,7 +25,10 @@ class SocialAccountController extends Controller
     public function handleProviderCallback(SocialAccountService $service, $provider)
     {
         $user = $service->createOrGetUser(Socialite::with($provider)->stateless());
-        return Response::generateResponse(HttpStatusCode::OK, '', $user);
+        if ($user) {
+            $authToken = $user->createToken('MyApp');
+            return redirect()->to('http://localhost:3000/auth/process-login-social?token=' . $authToken->accessToken);
+        }
 
     }
 
