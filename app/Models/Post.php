@@ -205,4 +205,8 @@ class Post extends Model
     public function image() {
         return $this->belongsTo('App\Models\Image', 'image_id');
     }
+
+    public function video() {
+        return $this->belongsTo('App\Models\Video', 'video_id');
+    }
 }

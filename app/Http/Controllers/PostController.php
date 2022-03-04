@@ -79,12 +79,13 @@ class PostController extends Controller
         $fileNames = [];
 
         if ($request->file('files')) {
+            // dd($request->file('files'));
             foreach($request->file('files') as $file) {
                 $fileNames[] = Storage::disk('local')->put('tmp/files', $file);
             }
         }
 
-        ProcessCreatePost::dispatch(Auth::guard('api')->user()->id, $request->except('images'), Lang::getLocale(), $fileNames, Helper::getClientIps(), Helper::getClientAgent());
+        ProcessCreatePost::dispatch(Auth::guard('api')->user()->id, $request->except('files'), Lang::getLocale(), $fileNames, Helper::getClientIps(), Helper::getClientAgent());
 
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
     } 

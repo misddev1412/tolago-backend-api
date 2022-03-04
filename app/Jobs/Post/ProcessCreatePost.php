@@ -11,7 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Post;
 use Storage;
 use Log;
-use Illuminate\Http\File;
+use File;
 use Notification;
 use App\Notifications\NewPost;
 use App\Models\User;
@@ -19,6 +19,7 @@ use App\Jobs\Post\ProcessCachePost;
 use App\Services\PostService;
 use MeiliSearch\Client;
 use App\Jobs\Media\ProcessImage;
+use App\Jobs\Media\ProcessVideo;
 use App\Models\UserCount;
 use App\Enum\PostType;
 use App\Services\ActivityLogService;
@@ -37,18 +38,18 @@ class ProcessCreatePost implements ShouldQueue
     protected $post;
     protected $request;
     protected $userId;
-    protected $images;
+    protected $files;
     protected $locale;
     protected $ip;
     protected $userAgent;
     protected $searchIndex = 'posts';
 
     //construct post model
-    public function __construct($userId, $request, $locale, $images, $ip, $userAgent)
+    public function __construct($userId, $request, $locale, $files, $ip, $userAgent)
     {
         $this->userId = $userId;
         $this->request = $request;
-        $this->images = $images;
+        $this->files = $files;
         $this->locale = $locale;
         $this->ip = $ip;
         $this->userAgent = $userAgent;
@@ -99,7 +100,7 @@ class ProcessCreatePost implements ShouldQueue
                 }
                 $postChildren = [];
 
-                foreach ($this->images as $image) {
+                foreach ($this->files as $file) {
                     $dataCreate['body'] = '';
                     $dataCreate['main_id'] = $post->id;
 
@@ -107,8 +108,12 @@ class ProcessCreatePost implements ShouldQueue
                 }
 
                 $i = 0;
-                foreach ($this->images as $image) {
-                    ProcessImage::dispatch($image, $this->userId, 'post', $postChildren[$i], $this->ip, $this->userAgent);
+                foreach ($this->files as $file) {
+                    if (File::extension($file) == 'jpg' || File::extension($file) == 'jpeg' || File::extension($file) == 'png' || File::extension($file) == 'gif') {
+                        ProcessImage::dispatch($file, $this->userId, 'post', $postChildren[$i], $this->ip, $this->userAgent);
+                    } else if (File::extension($file) == 'mp4' || File::extension($file) == 'webm' || File::extension($file) == 'ogg') {
+                        ProcessVideo::dispatch($file, $this->userId, 'post', $postChildren[$i], $this->ip, $this->userAgent);
+                    }
                     $i++;
                 }
 

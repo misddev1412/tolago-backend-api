@@ -6,6 +6,7 @@ use App\Models\Post;
 use \Cviebrock\EloquentSluggable\Services\SlugService;
 use Image;
 use App\Models\Image as ImageModel;
+use App\Models\Video as VideoModel;
 use Auth;
 use Storage;
 use Illuminate\Http\File;
@@ -18,6 +19,7 @@ use App\Models\ImageUtility;
 use App\Models\User;
 use App\Models\Hotel;
 use App\Models\Room;
+use App\Models\Video;
 use App\Models\Utility;
 
 class MediaService
@@ -25,7 +27,6 @@ class MediaService
     public static function commonImage($imageFile, $userId, $table, $objectId, $mainImage = true): ImageModel
     {
         $imagePath  = storage_path() . '//app/' . $imageFile;
-        \Log::info($imagePath);
         $extension = pathinfo($imageFile, PATHINFO_EXTENSION);
         
         $directory = storage_path() . '//app/public/images/' . $userId . '/';
@@ -143,5 +144,37 @@ class MediaService
         return $image;
     }
 
+    public static function commonVideo($videoFile, $userId, $table, $objectId, $mainVideo = true): VideoModel
+    {
+        $videoPath  = storage_path() . '//app/' . $videoFile;
+        $extension = pathinfo($videoFile, PATHINFO_EXTENSION);
+        
+        $directory = storage_path() . '//app/public/videos/' . $userId . '/';
+
+        if (!file_exists($directory)) {
+            mkdir($directory, 0777, true);
+        }
+
+        $file = Storage::disk('Wasabi')->putFile(env('UPLOAD_VIDEO_PATH') . '/' . $userId, new File($videoPath), $videoPath); 
+        if ($file) {
+            $delete = Storage::disk('local')->delete('public/videos/' . $userId . '/' . $videoFile);
+        
+        }   
+        $video = Video::create([
+            'original_url' => $file,
+            'user_id' => $userId,
+        ]); 
+
+        if ($video) { 
+            switch ($table) {
+                case 'post':
+                    
+                    Post::where('id', $objectId)->update(['video_id' => $video->id]);
+                    break;
+            }
+        }
+
+        return $video;
+    }
 
 }

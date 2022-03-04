@@ -11,7 +11,7 @@ class Video extends Model
     protected $table = 'videos';
     //fields for videos
     protected $fillable = [
-        'orignal_url',
+        'original_url',
         'thumbnail_url',
         '240p_url',
         '360p_url',
@@ -25,4 +25,9 @@ class Video extends Model
         'created_at',
         'updated_at',
     ];
+
+    public function getOriginalUrlAttribute()
+    {
+        return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['original_url'];
+    }
 }

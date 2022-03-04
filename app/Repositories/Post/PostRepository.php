@@ -64,7 +64,7 @@ class PostRepository implements PostRepositoryInterface
         }
         $posts->load('user.image');
         $posts->load('images');
-        $posts->load('postChildren.image');
+        $posts->load('postChildren.video', 'postChildren.image');
         $posts->load('translationCurrentLanguage');
         return $posts;
     }
