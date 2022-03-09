@@ -3,11 +3,12 @@
 namespace App\Services;
 use Cache;
 use App\Models\Post;
-use \Cviebrock\EloquentSluggable\Services\SlugService;
+use FFMpeg\Format\Video\X264;
 use Image;
 use App\Models\Image as ImageModel;
 use App\Models\Video as VideoModel;
 use Auth;
+use ProtoneMedia\LaravelFFMpeg\Support\FFMpeg;
 use Storage;
 use Illuminate\Http\File;
 use App\Models\ImagePost;
@@ -15,12 +16,14 @@ use App\Models\ImageMessage;
 use App\Models\ImageUser;
 use App\Models\ImageHotel;
 use App\Models\ImageRoom;
+use App\Models\ImageVideo;
 use App\Models\ImageUtility;
 use App\Models\User;
 use App\Models\Hotel;
 use App\Models\Room;
 use App\Models\Video;
 use App\Models\Utility;
+use Str;
 
 class MediaService
 {
@@ -28,7 +31,7 @@ class MediaService
     {
         $imagePath  = storage_path() . '//app/' . $imageFile;
         $extension = pathinfo($imageFile, PATHINFO_EXTENSION);
-        
+
         $directory = storage_path() . '//app/public/images/' . $userId . '/';
 
         if (!file_exists($directory)) {
@@ -56,19 +59,19 @@ class MediaService
             $constraint->aspectRatio();
         });
         $medium->encode('jpg', 75);
-        $medium->save($directory . $fileName . '_medium' . '.' . $extension);;
+        $medium->save($directory . $fileName . '_medium' . '.' . $extension);
 
         $large = Image::make($imagePath);
         $large->resize(null, 600, function ($constraint) {
             $constraint->aspectRatio();
         });
         $large->encode('jpg', 75);
-        $large->save($directory . $fileName . '_large' . '.' . $extension);;
+        $large->save($directory . $fileName . '_large' . '.' . $extension);
 
         $original = Image::make($imagePath);
         $original->encode('jpg', 75);
-        $original->save($directory .  $fileName . '_original' . '.' . $extension);;
-        
+        $original->save($directory .  $fileName . '_original' . '.' . $extension);
+
 
         $imageToStorage = [
             'default' =>  $fileName . '.' . $extension,
@@ -81,10 +84,10 @@ class MediaService
         $fileNames = [];
         foreach ($imageToStorage as $key => $value) {
             // \Log::info($value);
-            $file = Storage::disk('Wasabi')->putFile(env('UPLOAD_IMAGE_PATH') . '/' . $userId, new File($directory . $value), $value);     
+            $file = Storage::disk('Wasabi')->putFile(env('UPLOAD_IMAGE_PATH') . '/' . $userId, new File($directory . $value), $value);
             if ($file) {
                 $fileNames[$key] = $file;
-                $delete = Storage::disk('local')->delete('public/images/' . $userId . '/' . $value);
+                Storage::disk('local')->delete('public/images/' . $userId . '/' . $value);
             }
         }
 
@@ -130,6 +133,12 @@ class MediaService
                         Room::where('id', $objectId)->update(['image_id' => $image->id]);
                     }
                     break;
+                case 'video':
+                    ImageVideo::create([
+                        'image_id' => $image->id,
+                        'video_id' => $objectId,
+                    ]);
+                    break;
                 case 'utility':
                     ImageUtility::create([
                         'image_id' => $image->id,
@@ -139,7 +148,7 @@ class MediaService
                         Utility::where('id', $objectId)->update(['image_id' => $image->id]);
                     }
                     break;
-            }   
+            }
         }
         return $image;
     }
@@ -148,27 +157,70 @@ class MediaService
     {
         $videoPath  = storage_path() . '//app/' . $videoFile;
         $extension = pathinfo($videoFile, PATHINFO_EXTENSION);
-        
+
         $directory = storage_path() . '//app/public/videos/' . $userId . '/';
 
         if (!file_exists($directory)) {
             mkdir($directory, 0777, true);
         }
 
-        $file = Storage::disk('Wasabi')->putFile(env('UPLOAD_VIDEO_PATH') . '/' . $userId, new File($videoPath), $videoPath); 
-        if ($file) {
-            $delete = Storage::disk('local')->delete('public/videos/' . $userId . '/' . $videoFile);
-        
-        }   
-        $video = Video::create([
-            'original_url' => $file,
-            'user_id' => $userId,
-        ]); 
+        $lowBitrate = (new X264)->setKiloBitrate(250);
+        $midBitrate = (new X264)->setKiloBitrate(500);
+        $highBitrate = (new X264)->setKiloBitrate(1000);
+        $superBitrate = (new X264)->setKiloBitrate(1500);
 
-        if ($video) { 
+        $randomName = Str::random(16);
+        $videoFileName = env('UPLOAD_VIDEO_PATH') . '/' . $userId .   '/' . $randomName .  '.m3u8';
+
+        FFMpeg::fromDisk('local')
+            ->open($videoFile)
+            ->exportForHLS()
+
+            ->addFormat($lowBitrate, function($media) {
+                $media->addFilter('scale=640:480');
+            })
+            ->addFormat($midBitrate, function($media) {
+                $media->scale(960, 720);
+            })
+            ->addFormat($highBitrate, function ($media) {
+                $media->addFilter(function ($filters, $in, $out) {
+                    $filters->custom($in, 'scale=1920:1200', $out); // $in, $parameters, $out
+                });
+            })
+            ->addFormat($superBitrate, function($media) {
+                $media->addLegacyFilter(function ($filters) {
+                    $filters->resize(new \FFMpeg\Coordinate\Dimension(2560, 1920));
+                });
+            })
+            ->toDisk('Wasabi')
+            ->save($videoFileName);
+
+        FFMpeg::fromDisk('local')
+            ->open($videoFile)
+            ->getFrameFromSeconds(10)
+            ->export()
+            ->toDisk('Wasabi')
+            ->save(env('UPLOAD_VIDEO_PATH') . '/' . $userId .   '/' . $randomName . '.png');
+
+        $path = env('UPLOAD_ASSET_PATH') . '/' . env('UPLOAD_VIDEO_PATH') . '/' . $userId .   '/' . $randomName . '.png';
+        $imagePath = Image::make($path)->save(storage_path('app/tmp/files/' . $randomName . '.png'));
+
+        $media = FFMpeg::fromDisk('local')
+            ->open($videoFile);
+        $durationInSeconds = $media->getDurationInSeconds(); // returns an int
+
+        $video = Video::create([
+            'original_url' => $videoFileName,
+            'user_id' => $userId,
+            'duration_in_seconds' => $durationInSeconds,
+        ]);
+        MediaService::commonImage('tmp/files/' . $randomName . '.png', $userId, 'video', $video->id, false);
+
+
+        if ($video) {
             switch ($table) {
                 case 'post':
-                    
+
                     Post::where('id', $objectId)->update(['video_id' => $video->id]);
                     break;
             }

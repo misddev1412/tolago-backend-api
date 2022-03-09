@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Jobs\Auth;
+namespace App\Jobs\UserFriend;
 
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
@@ -8,38 +8,29 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use App\Models\UserFriend;
 use App\Models\User;
-use App\Services\ActivityLogService;
-use App\Models\UserSetting;
-use App\Models\UserCount;
-use App\Models\UserRole;
-use App\Models\Role;
 use MeiliSearch\Client;
-use App\Services\UserService;
+use Notification;
+use App\Notifications\InviteFriend;
 
-class ProcessSignup implements ShouldQueue
+class ProcessAcceptFriend implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    protected $dataCreate;
-    protected $request;
-    protected $ip;
-    protected $userAgent;
-    protected $searchIndex = 'users';
-    protected $userRepository;
+    private $userId;
+    private $friendId;
+    protected $searchIndex = 'user_friends';
 
     /**
      * Create a new job instance.
      *
      * @return void
      */
-    public function __construct($dataCreate, $request, $userRepository, $ip, $userAgent)
+    public function __construct($userId, $friendId)
     {
-        $this->dataCreate = $dataCreate;
-        $this->request = $request;
-        $this->userRepository = $userRepository;
-        $this->ip = $ip;
-        $this->userAgent = $userAgent;
+        $this->userId = $userId;
+        $this->friendId = $friendId;
     }
 
     /**
@@ -49,28 +40,24 @@ class ProcessSignup implements ShouldQueue
      */
     public function handle()
     {
-        //
-        $user = $this->userRepository->store($this->dataCreate);
+        $userFriend = UserFriend::where('user_id', $this->userId)
+            ->where('friend_id', $this->friendId)
+            ->first();
 
-        if ($user) {
-            $userService = new UserService(User::findOrFail($user->id));
-            $userService->cacheSingleUser();
+        $userFriend->status = UserFriend::ACCEPTED;
+        $userFriend->save();
 
-            UserSetting::create([
-                'user_id' => $user->id,
+        if ($userFriend) {
+            UserFriend::create([
+                'user_id' => $this->friendId,
+                'friend_id' => $this->userId,
+                'status' => UserFriend::ACCEPTED,
             ]);
 
-            UserCount::create([
-                'user_id' => $user->id,
-            ]);
-
-            Role::where('slug', 'user')->first()->users()->attach($user->id);
-
-            $activityLogService = new ActivityLogService();
-            $activityLogService->createActivityLog($user->id, 'signup', $user->id, 'users', 'success', $this->request, $this->ip, $this->ip, $this->userAgent);
             $this->initIndexMeiliSearchEngine();
             $this->addSortAbleToSearchEngine();
             $this->addFilterAbleToSearchEngine();
+
         }
     }
 
@@ -82,7 +69,7 @@ class ProcessSignup implements ShouldQueue
 
         } catch (\MeiliSearch\Exceptions\ApiException $e) {
             if ($e->getCode() == 404) {
-                $client->createIndex($this->searchIndex, ['primaryKey' => 'id']);
+                $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
             }
         }
 
@@ -100,15 +87,15 @@ class ProcessSignup implements ShouldQueue
 
     }
 
+
     protected function addFilterAbleToSearchEngine()
     {
         $client = new Client(env('MEILISEARCH_HOST'), env('MEILISEARCH_KEY'));
         $index = $client->getIndex($this->searchIndex);
 
         $index->updateFilterableAttributes([
-            'email',
-            'phone_number',
-            'username',
+            'user_id',
+            'friend_id',
             'status'
         ]);
 

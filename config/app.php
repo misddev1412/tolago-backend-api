@@ -182,7 +182,7 @@ return [
         Intervention\Image\ImageServiceProvider::class,
         Kreait\Laravel\Firebase\ServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
-
+        ProtoneMedia\LaravelFFMpeg\Support\ServiceProvider::class
 
     ],
 
@@ -202,6 +202,8 @@ return [
         'Image' => Intervention\Image\Facades\Image::class,
         'Helper' => App\Helpers\Helper::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
+        'FFMpeg' => ProtoneMedia\LaravelFFMpeg\Support\FFMpeg::class
+
 
     ])->toArray(),
 

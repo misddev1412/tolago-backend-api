@@ -21,7 +21,7 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'first_name', 
+        'first_name',
         'last_name',
         'email',
         'password',
@@ -44,10 +44,17 @@ class User extends Authenticatable
         'address_book_id',
         'is_phone_verified',
         'remember_token',
-        'is_random_password'
+        'is_random_password',
+        'last_login'
     ];
 
-    protected $appends = ['fullname'];
+    protected $appends = ['fullname', 'is_online'];
+
+    //function attributes is_online
+    public function getIsOnlineAttribute()
+    {
+        return $this->last_login > now()->subMinutes(5);
+    }
 
     //function attributes fullname
     protected function fullname(): Attribute

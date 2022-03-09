@@ -29,6 +29,12 @@ class RepositoryServiceProvider extends ServiceProvider
             'App\Repositories\User\UserRepository'
         );
 
+        //register repository userFriend
+        $this->app->bind(
+            'App\Repositories\UserFriend\UserFriendRepositoryInterface',
+            'App\Repositories\UserFriend\UserFriendRepository'
+        );
+
         //register repository hotel
         $this->app->bind(
             'App\Repositories\Hotel\HotelRepositoryInterface',

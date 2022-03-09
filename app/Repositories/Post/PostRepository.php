@@ -1,4 +1,4 @@
-<?php 
+<?php
 
 namespace App\Repositories\Post;
 
@@ -36,7 +36,8 @@ class PostRepository implements PostRepositoryInterface
             $postService = new PostService($data);
             $postService->cacheSinglePost();
         }
-        return $data; 
+        $data->total_likes = $this->countGroupLikeType($data->id);
+        return $data;
     }
 
     //index function
@@ -56,7 +57,7 @@ class PostRepository implements PostRepositoryInterface
                 if (!$viewFull) {
                     $options['filter'] = ['status = 1'];
                 }
-    
+
                 return $search->search($query, $options);
             })->where('user_id', 1)->where('main_id', 0)->paginate($perPage);
         } else {
@@ -64,7 +65,13 @@ class PostRepository implements PostRepositoryInterface
         }
         $posts->load('user.image');
         $posts->load('images');
-        $posts->load('postChildren.video', 'postChildren.image');
+        $posts->load('postChildren.video.images', 'postChildren.image');
+        $posts->load('comments');
+        $posts->load('postCount');
+        $posts->map(function ($post) {
+            $post->total_likes = $this->countGroupLikeType($post->id);
+            return $post;
+        });
         $posts->load('translationCurrentLanguage');
         return $posts;
     }
@@ -104,7 +111,11 @@ class PostRepository implements PostRepositoryInterface
             ];
             return $search->search($query, $options);
         })->paginate($perPage);
-        
+
         return $posts;
+    }
+
+    private function countGroupLikeType($postId) {
+        return $this->post->countGroupLikeType($postId);
     }
 }

@@ -14,13 +14,16 @@ use Illuminate\Support\Facades\Storage;
 use App\Jobs\Post\ProcessCreatePost;
 use App\Jobs\Post\ProcessUpdatePost;
 use App\Jobs\Post\ProcessDeletePost;
+use App\Jobs\Post\ProcessLikePost;
+use App\Jobs\Post\ProcessCommentPost;
 use App\Jobs\Post\ProcessPostTranslation;
+use App\Jobs\Post\ProcessUnlikePost;
 use Gate;
 use Lang;
 use App\Services\MediaService;
 use App\Repositories\Post\PostRepositoryInterface;
 use App\Helpers\Helper;
-
+use App\Models\Comment;
 
 class PostController extends Controller
 {
@@ -28,7 +31,7 @@ class PostController extends Controller
     //init post variables
     protected $post;
     protected $postRepository;
-    
+
     //structed controller with post model
     public function __construct(Post $post, PostRepositoryInterface $postRepository)
     {
@@ -64,18 +67,18 @@ class PostController extends Controller
         if (Gate::forUser(Auth::guard('api')->user())->denies('view-post', $post)) {
             return Response::generateResponse(HttpStatusCode::FORBIDDEN, '', []);
         }
-        
+
         return Response::generateResponse(HttpStatusCode::OK, '', $post);
     }
 
     //resources store scope create return generateResponse
     public function store(CreatePostRequest $request)
     {
-        
+
         if (Gate::forUser(Auth::guard('api')->user())->denies('create-post')) {
             return Response::generateResponse(HttpStatusCode::FORBIDDEN, '', []);
         }
-        
+
         $fileNames = [];
 
         if ($request->file('files')) {
@@ -88,7 +91,7 @@ class PostController extends Controller
         ProcessCreatePost::dispatch(Auth::guard('api')->user()->id, $request->except('files'), Lang::getLocale(), $fileNames, Helper::getClientIps(), Helper::getClientAgent());
 
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
-    } 
+    }
 
     //function translation controller
     public function translation($id, TranslationPostRequest $request)
@@ -117,7 +120,7 @@ class PostController extends Controller
         } else {
             $request = $request->except('image');
         }
-        
+
         ProcessUpdatePost::dispatch(Auth::guard('api')->user()->id, $request, $id, $fileName, Helper::getClientIps(), Helper::getClientAgent());
 
         return Response::generateResponse(HttpStatusCode::OK, '', []);
@@ -136,5 +139,41 @@ class PostController extends Controller
         return Response::generateResponse(HttpStatusCode::OK, '', []);
     }
 
-    
+
+    public function like(Request $request, $id)
+    {
+        $post = $this->post->findOrFail($id);
+
+        ProcessLikePost::dispatch($id, Auth::guard('api')->user()->id, $request->only('like_type'), Helper::getClientIps(), Helper::getClientAgent());
+
+        return Response::generateResponse(HttpStatusCode::OK, '', []);
+    }
+
+    public function unlike(Request $request, $id)
+    {
+        $post = $this->post->findOrFail($id);
+
+        ProcessUnlikePost::dispatch($id, Auth::guard('api')->user()->id, $request->only('like_type'), Helper::getClientIps(), Helper::getClientAgent());
+
+        return Response::generateResponse(HttpStatusCode::OK, '', []);
+    }
+
+    public function comment(Request $request, $id) {
+        $post = $this->post->findOrFail($id);
+
+        ProcessCommentPost::dispatch($id, Auth::guard('api')->user()->id, $request->only('comment_text'), Helper::getClientIps(), Helper::getClientAgent());
+
+        return Response::generateResponse(HttpStatusCode::OK, '', []);
+    }
+
+    public function commentList(Request $request, $id) {
+        $comments  = Comment::where('commentable_type', 'App\Models\Post')
+            ->where('commentable_id', $id)
+            ->where('parent_id', 0)
+            ->with('user.image')
+            ->orderBy('created_at', 'desc')->paginate($request->get('limit', 10), ['*'], 'page', $request->get('page', 1));
+        return Response::generateResponse(HttpStatusCode::OK, '', $comments);
+    }
+
+
 }

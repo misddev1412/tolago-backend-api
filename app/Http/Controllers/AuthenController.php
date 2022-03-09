@@ -86,6 +86,7 @@ class AuthenController extends Controller
     public function me()
     {
         $user = User::withAll()->find(Auth::guard('api')->user()->id);
+        $user->update(['last_login' => now()]);
         return Response::generateResponse(HttpStatusCode::OK, '', $user);
     }
 
@@ -135,7 +136,7 @@ class AuthenController extends Controller
         return Response::generateResponse(HttpStatusCode::OK, '', []);
     }
 
-    public function createQrUrl() 
+    public function createQrUrl()
     {
         $googleAuthenticator = new \PHPGangsta_GoogleAuthenticator();
         $secretCode = $googleAuthenticator->createSecret();
@@ -148,7 +149,7 @@ class AuthenController extends Controller
         ]);
     }
 
-    public function enableQrCode(EnableQrCodeRequest $request) 
+    public function enableQrCode(EnableQrCodeRequest $request)
     {
         $googleAuthenticator = new \PHPGangsta_GoogleAuthenticator();
         $secretCode = Auth::guard('api')->user()->secret_code;

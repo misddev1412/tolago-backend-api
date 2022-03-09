@@ -12,7 +12,6 @@ class Video extends Model
     //fields for videos
     protected $fillable = [
         'original_url',
-        'thumbnail_url',
         '240p_url',
         '360p_url',
         '480p_url',
@@ -22,6 +21,7 @@ class Video extends Model
         '4096p_url',
         'hls_url',
         'user_id',
+        'duration_in_seconds',
         'created_at',
         'updated_at',
     ];
@@ -29,5 +29,22 @@ class Video extends Model
     public function getOriginalUrlAttribute()
     {
         return env('UPLOAD_ASSET_PATH') . '/' . $this->attributes['original_url'];
+    }
+
+
+    public function getDurationInSecondsAttribute()
+    {
+        return  gmdate("H:i:s", $this->attributes['duration_in_seconds']);
+    }
+
+    //relationships with images table and videos table
+    public function user()
+    {
+        return $this->belongsTo('App\Models\User');
+    }
+
+    public function images()
+    {
+        return $this->belongsToMany('App\Models\Image', 'image_videos', 'video_id', 'image_id');
     }
 }

@@ -37,6 +37,10 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
 
     Route::post('post/translation/{id}', [PostController::class, 'translation']);
     Route::get('post/search/suggestion', [PostController::class, 'autocomplete']);
+    Route::post('post/like/{id}', [PostController::class, 'like']);
+    Route::delete('post/unlike/{id}', [PostController::class, 'unlike']);
+    Route::post('post/comment/{id}', [PostController::class, 'comment']);
+    Route::get('post/comment/{id}', [PostController::class, 'commentList']);
     Route::apiResource('post', PostController::class);
     Route::apiResource('hotel', HotelController::class);
     Route::apiResource('room', RoomController::class);
@@ -53,12 +57,16 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
     Route::post('logout', [AuthenController::class, 'logout']);
 
     Route::post('friend/invite/{id}', [FriendController::class, 'sendInvite']);
+    Route::post('friend/accept/{id}', [FriendController::class, 'acceptInvite']);
+    Route::get('friend/my-friend', [FriendController::class, 'myFriends']);
 
     Route::get('auth/create-qr-url', [AuthenController::class, 'createQrUrl']);
     Route::post('auth/enable-qr-url', [AuthenController::class, 'enableQrCode']);
     Route::put('auth/update-profile', [AuthenController::class, 'updateProfile']);
-    
+
     Route::get('address/lat-lang-from-address', [AddressController::class, 'getLatAndLangFromAddress']);
+
+    Route::get('user/newest', [UserController::class, 'newest']);
 });
 
 Route::group(['prefix' => 'v1/admin', 'middleware' => ['auth:api', 'admin']], function () {

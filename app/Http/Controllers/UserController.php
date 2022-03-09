@@ -62,8 +62,13 @@ class UserController extends Controller
 
         ProcessAdminUpdateUser::dispatch($userId, $updateData, $fileName, Auth::guard('api')->user()->id, Helper::getClientIps(), Helper::getClientAgent());
 
-    
+
 
         return Response::generateResponse(HttpStatusCode::OK, '', []);
+    }
+
+    public function newest()
+    {
+        return Response::generateResponse(HttpStatusCode::OK, '', $this->userRepository->newest(5));
     }
 }

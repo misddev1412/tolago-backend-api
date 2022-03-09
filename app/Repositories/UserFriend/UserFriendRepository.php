@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Repositories\User;
+namespace App\Repositories\UserFriend;
 
 /**
  * Interface GalleryRepositoryInterface
@@ -8,20 +8,23 @@ namespace App\Repositories\User;
  */
 use App\Models\User;
 
+use App\Models\UserFriend;
 use Cache;
 use App\Services\UserService;
 
 use Illuminate\Http\Request;
-class UserRepository implements UserRepositoryInterface
+class UserFriendRepository implements UserFriendRepositoryInterface
 {
 
     private $user;
 
     //constructor with Post model
-    public function __construct(User $user)
+    public function __construct(User $user, UserFriend $userFriend)
     {
         $this->user = $user;
+        $this->userFriend = $userFriend;
     }
+
 
     /**
      * @param $id
@@ -126,5 +129,24 @@ class UserRepository implements UserRepositoryInterface
         ->get();
         $users = $users->load('image')->take($limit);
         return $users;
+    }
+
+    public function myFriends($userId, $page = 1)
+    {
+        $limit = 10;
+        $userFriends = $this->userFriend->search('', function($search, string $query) use ($limit, $userId, $page) {
+            $options = [
+                'sort' => ['created_at:desc'],
+                'limit' => $limit,
+                'filter' => ['friend_id = ' . $userId],
+                'offset' => $limit * ($page - 1),
+            ];
+
+
+            return $search->search($query, $options);
+        })
+        ->paginate($limit);
+        $userFriends->load('user.image');
+        return $userFriends;
     }
 }

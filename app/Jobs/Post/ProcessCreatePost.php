@@ -78,10 +78,11 @@ class ProcessCreatePost implements ShouldQueue
                 'featured' => $this->request['featured'] ?? 0,
                 'type' => $this->request['type'] ?? 'user_post',
                 'main_id' => 0
-                
+
             ];
-    
+
             $post = Post::create($dataCreate);
+            $post->postCount()->create([]);
 
             if ($post) {
 
@@ -104,7 +105,9 @@ class ProcessCreatePost implements ShouldQueue
                     $dataCreate['body'] = '';
                     $dataCreate['main_id'] = $post->id;
 
-                    $postChildren[] = Post::create($dataCreate)->id;
+                    $postChildCreate = Post::create($dataCreate);
+                    $postChildCreate->postCount()->create([]);
+                    $postChildren[] = $postChildCreate->id;
                 }
 
                 $i = 0;
@@ -126,7 +129,7 @@ class ProcessCreatePost implements ShouldQueue
                 $this->request['locale'] = $this->locale;
 
                 $postService->createTranslation($post->id, $this->request);
-                
+
                 $this->initIndexMeiliSearchEngine();
                 $this->addSortAbleToSearchEngine();
                 $this->addFilterAbleToSearchEngine();
@@ -134,7 +137,7 @@ class ProcessCreatePost implements ShouldQueue
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
-    
+
     }
 
     protected function initIndexMeiliSearchEngine()
@@ -148,7 +151,7 @@ class ProcessCreatePost implements ShouldQueue
                 $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
             }
         }
-        
+
 
 
     }
@@ -160,7 +163,7 @@ class ProcessCreatePost implements ShouldQueue
         $index->updateSortableAttributes([
             'created_at'
         ]);
-        
+
     }
 
 
@@ -174,6 +177,6 @@ class ProcessCreatePost implements ShouldQueue
             'status',
             'featured'
         ]);
-        
+
     }
 }

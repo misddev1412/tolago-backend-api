@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\LikeType;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -41,7 +42,24 @@ class Post extends Model
         'meta_description',
         'meta_keywords',
     ];
-    
+
+    protected $appends = ['like_types', 'my_like'];
+
+    public function getLikeTypesAttribute()
+    {
+        return LikeType::get();
+    }
+
+    public function getMyLikeAttribute()
+    {
+        $user = auth('api')->user();
+        if ($user) {
+            $like = $this->myLike($user->id);
+            return $like;
+        }
+        return null;
+    }
+
     //translation functions for posts
     public function translation()
     {
@@ -137,7 +155,7 @@ class Post extends Model
     //with comments and likes and categories and user
     public function scopeWithAll($query)
     {
-        return $query->with('comments', 'likes', 'categories', 'user', 'images')->with([
+        return $query->with('comments', 'likes', 'categories', 'user', 'images', 'image', 'video')->with([
             'translation' => function ($query) {
                 $this->translatable[] = 'post_id';
                 $query->select($this->translatable)->where('locale', app()->getLocale());
@@ -157,7 +175,7 @@ class Post extends Model
         return $query->withAll()->paginate($perPage, $columns, $pageName, $page);
     }
 
-    //findorfail post by id and active and all relationships 
+    //findorfail post by id and active and all relationships
     public function scopeFindOrFailWithAll($query, $id)
     {
         return $query->withAll()->findOrFail($id);
@@ -209,4 +227,19 @@ class Post extends Model
     public function video() {
         return $this->belongsTo('App\Models\Video', 'video_id');
     }
+
+    //relationship with post count table
+    public function postCount() {
+        return $this->hasOne('App\Models\PostCount');
+    }
+
+    public function myLike($user_id) {
+        return $this->likes()->with('likeType')->where('user_id', $user_id)->first();
+    }
+
+    public static function countGroupLikeType($postId) {
+        return DB::select("SELECT like_type_id, CONCAT(?, icon) as icon, count(*) as count FROM likes JOIN like_types ON likes.like_type_id = like_types.id WHERE likeable_id = ? AND likeable_type = ? GROUP BY like_type_id", [env('UPLOAD_ASSET_PATH') . '/', $postId, 'App\Models\Post']);
+    }
+
+
 }
