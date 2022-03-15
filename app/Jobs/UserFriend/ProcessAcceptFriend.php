@@ -40,8 +40,8 @@ class ProcessAcceptFriend implements ShouldQueue
      */
     public function handle()
     {
-        $userFriend = UserFriend::where('user_id', $this->userId)
-            ->where('friend_id', $this->friendId)
+        $userFriend = UserFriend::where('user_id', $this->friendId)
+            ->where('friend_id', $this->userId)
             ->first();
 
         $userFriend->status = UserFriend::ACCEPTED;
@@ -49,8 +49,8 @@ class ProcessAcceptFriend implements ShouldQueue
 
         if ($userFriend) {
             UserFriend::create([
-                'user_id' => $this->friendId,
-                'friend_id' => $this->userId,
+                'user_id' => $this->userId,
+                'friend_id' => $this->friendId,
                 'status' => UserFriend::ACCEPTED,
             ]);
 
@@ -69,7 +69,7 @@ class ProcessAcceptFriend implements ShouldQueue
 
         } catch (\MeiliSearch\Exceptions\ApiException $e) {
             if ($e->getCode() == 404) {
-                $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
+                $client->createIndex($this->searchIndex, ['primaryKey' => 'id']);
             }
         }
 

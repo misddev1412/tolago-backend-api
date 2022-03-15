@@ -84,14 +84,14 @@ class ProcessCreateHotel implements ShouldQueue
             foreach ($this->images as $file) {
                 if ($file) {
                     ProcessImage::dispatch($file, $this->userId, 'hotel', $createHotel->id, $this->ip, $this->userAgent, $mainImage = false);
-    
+
                 }
             }
             $dataCreate['locale'] = $this->locale;
 
             $hotelService = new HotelService($createHotel);
             $hotelService->createTranslation($createHotel->id, $dataCreate);
-            
+
             $this->initIndexMeiliSearchEngine();
             $this->addSortAbleToSearchEngine();
             $this->addFilterAbleToSearchEngine();
@@ -107,10 +107,10 @@ class ProcessCreateHotel implements ShouldQueue
 
         } catch (\MeiliSearch\Exceptions\ApiException $e) {
             if ($e->getCode() == 404) {
-                $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
+                $client->createIndex($this->searchIndex, ['primaryKey' => 'id']);
             }
         }
-        
+
 
 
     }
@@ -122,7 +122,7 @@ class ProcessCreateHotel implements ShouldQueue
         $index->updateSortableAttributes([
             'created_at'
         ]);
-        
+
     }
 
 
@@ -139,6 +139,6 @@ class ProcessCreateHotel implements ShouldQueue
             'status',
             'featured'
         ]);
-        
+
     }
 }

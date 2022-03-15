@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Broadcast;
 use App\Broadcasting\UserChannel;
+use App\Broadcasting\UserGlobal;
 use Illuminate\Broadcasting\PrivateChannel;
 
 /*
@@ -22,5 +23,6 @@ use Illuminate\Broadcasting\PrivateChannel;
 
 
 
-Broadcast::channel('channel-name.{id}', UserChannel::class);
+Broadcast::channel('chat-private.{id}.{userId}', UserChannel::class);
+Broadcast::channel('global.{id}', UserGlobal::class);
 

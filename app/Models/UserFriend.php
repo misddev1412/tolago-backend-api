@@ -13,6 +13,7 @@ class UserFriend extends Model
     public const ACCEPTED = 'accepted';
     use HasFactory, Searchable;
     //fields for user_friends table
+    protected $table = 'user_friends';
     protected $fillable = ['user_id', 'friend_id', 'status', 'created_at', 'updated_at'];
 
     //user relation
@@ -39,6 +40,8 @@ class UserFriend extends Model
 
         return $array;
     }
+
+
 
 
 }

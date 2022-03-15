@@ -40,6 +40,7 @@ class ProcessInviteFriend implements ShouldQueue
      */
     public function handle()
     {
+
         $userFriend = UserFriend::create([
             'user_id' => $this->userId,
             'friend_id' => $this->friendId,
@@ -50,7 +51,7 @@ class ProcessInviteFriend implements ShouldQueue
             $user = User::find($this->userId);
             $friend = User::find($this->friendId);
             Notification::send($friend, new InviteFriend($user, $friend));
-            
+
         }
     }
 }

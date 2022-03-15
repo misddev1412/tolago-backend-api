@@ -4,7 +4,7 @@ namespace App\Broadcasting;
 
 use App\Models\User;
 
-class UserChannel
+class UserGlobal
 {
     /**
      * Create a new channel instance.

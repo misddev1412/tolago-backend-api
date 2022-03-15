@@ -57,15 +57,15 @@ class ProcessCreateUtility implements ShouldQueue
                 'user_id' => $this->userId,
                 'status' => $this->request['status'] ?? 1,
                 'type' => $this->request['type'],
-                
+
             ];
-    
+
             $utility = Utility::create($dataCreate);
 
             if ($utility) {
 
                 $activityLogService = new ActivityLogService();
-                $activityLogService->createActivityLog($utility->user_id, 'create_utility', $utility->id, 'utilities', 'success', $this->request, $this->ip, $this->userAgent);                
+                $activityLogService->createActivityLog($utility->user_id, 'create_utility', $utility->id, 'utilities', 'success', $this->request, $this->ip, $this->userAgent);
 
                 ProcessImage::dispatch($this->imageFileTmp, $this->userId, 'utility', $utility->id, $this->ip, $this->userAgent);
 
@@ -76,7 +76,7 @@ class ProcessCreateUtility implements ShouldQueue
                 $this->request['locale'] = $this->locale;
 
                 $utilityService->createTranslation($utility->id, $this->request);
-                
+
                 $this->initIndexMeiliSearchEngine();
                 $this->addSortAbleToSearchEngine();
                 $this->addFilterAbleToSearchEngine();
@@ -84,7 +84,7 @@ class ProcessCreateUtility implements ShouldQueue
         } catch (Exception $e) {
             Log::error($e->getMessage());
         }
-    
+
     }
 
     protected function initIndexMeiliSearchEngine()
@@ -95,10 +95,10 @@ class ProcessCreateUtility implements ShouldQueue
 
         } catch (\MeiliSearch\Exceptions\ApiException $e) {
             if ($e->getCode() == 404) {
-                $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
+                $client->createIndex($this->searchIndex, ['primaryKey' => 'id']);
             }
         }
-        
+
 
 
     }
@@ -110,7 +110,7 @@ class ProcessCreateUtility implements ShouldQueue
         $index->updateSortableAttributes([
             'created_at'
         ]);
-        
+
     }
 
 
@@ -124,6 +124,6 @@ class ProcessCreateUtility implements ShouldQueue
             'status',
             'featured'
         ]);
-        
+
     }
 }

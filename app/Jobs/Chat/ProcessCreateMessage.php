@@ -2,6 +2,8 @@
 
 namespace App\Jobs\Chat;
 
+use App\Enum\GlobalNotificationType;
+use App\Events\GlobalNotification;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -50,12 +52,18 @@ class ProcessCreateMessage implements ShouldQueue
         foreach ($this->files as $file) {
             if ($file) {
                 ProcessImage::dispatch($file, $this->dataCreate['sender_id'], 'message', $message->id, $this->ip, $this->userAgent);
-
             }
         }
-    
+
+        $message->load('sender.image');
+        $message->load('recipient.image');
 
         $user = User::findOrFail($message->sender_id);
         event(new MessagePosted($message, $user, $message->recipient_id));
+        $totalUnread = (new Message)->countUnreadMessagesGroupByRecipientId();
+        $totalUnread = json_encode($totalUnread);
+        \Log::info($totalUnread);
+
+        event(new GlobalNotification($totalUnread, GlobalNotificationType::NewMessage, $message->recipient_id));
     }
 }

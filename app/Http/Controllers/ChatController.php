@@ -17,7 +17,7 @@ use Storage;
 class ChatController extends Controller
 {
 
-    
+
     //construct chat controller with message model
     public function __construct(Message $message)
     {
@@ -25,9 +25,7 @@ class ChatController extends Controller
     }
 
     public function chat() {
-        $firebase = new FirebaseService();
-        $database = $firebase->database();
-        return response()->json($value);
+
     }
 
     //store chat message to database and return generated response
@@ -55,4 +53,12 @@ class ChatController extends Controller
 
         return Response::generateResponse(HttpStatusCode::CREATED, '', []);
     }
+
+    public function chatWithRecipient(Request $request, $recipientId)
+    {
+        $recipient = User::findOrFail($recipientId);
+        $messages = $this->message->getChatMessages(Auth::guard('api')->user()->id, $recipientId, $request->page);
+        return response()->json($messages);
+    }
+
 }

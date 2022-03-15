@@ -50,6 +50,7 @@ Route::prefix('v1')->middleware('auth:api')->group(function () {
     Route::apiResource('category', CategoryController::class);
 
     Route::get('chat', [ChatController::class, 'chat']);
+    Route::get('chat/{recipient_id}', [ChatController::class, 'chatWithRecipient']);
     Route::post('chat', [ChatController::class, 'store']);
 
     Route::get('me', [AuthenController::class, 'me']);

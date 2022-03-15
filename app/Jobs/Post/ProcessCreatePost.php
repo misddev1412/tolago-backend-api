@@ -148,7 +148,7 @@ class ProcessCreatePost implements ShouldQueue
 
         } catch (\MeiliSearch\Exceptions\ApiException $e) {
             if ($e->getCode() == 404) {
-                $client->createIndex($this->searchIndex, ['primaryKey' => 'user_id']);
+                $client->createIndex($this->searchIndex, ['primaryKey' => 'id']);
             }
         }
 

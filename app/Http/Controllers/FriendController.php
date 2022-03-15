@@ -52,7 +52,7 @@ class FriendController extends Controller
     //accept invite friend
     public function acceptInvite($friendId)
     {
-        $friend = $this->userFriend->where('user_id', Auth::guard('api')->user()->id)->where('friend_id', $friendId)->first();
+        $friend = $this->userFriend->where('user_id', $friendId)->where('friend_id', Auth::guard('api')->user()->id)->first();
         if (!$friend) {
             return Response::generateResponse(HttpStatusCode::NOT_FOUND, '', []);
         }

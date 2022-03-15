@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use App\Enum\GlobalNotificationType;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Broadcasting\PresenceChannel;
@@ -12,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use App\Models\Message;
 use App\Models\User;
 
-class MessagePosted implements ShouldBroadcast
+class GlobalNotification implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -22,14 +23,14 @@ class MessagePosted implements ShouldBroadcast
      * @return void
      */
     public $message;
-    public $user;
+    public $type;
     public $recipentId;
 
 
-    public function __construct(Message $message, User $user, $recipentId)
+    public function __construct(String $message, String $type , $recipentId)
     {
         $this->message = $message;
-        $this->user = $user;
+        $this->type = $type;
         $this->recipentId = $recipentId;
     }
 
@@ -40,12 +41,12 @@ class MessagePosted implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-        return new PrivateChannel('chat-private.' . $this->recipentId . '.' . $this->user->id);
+        return new PrivateChannel('global.' . $this->recipentId);
     }
 
     public function broadcastAs()
     {
-        return 'private-chat-event';
+        return 'global-event';
     }
 
 
