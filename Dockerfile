@@ -1,77 +1,61 @@
-FROM php:8.0.5-fpm-alpine
+FROM php:8.0-fpm
 
-# define timezone
-RUN echo "Asia/Ho_Chi_Minh" > /etc/timezone
-RUN dpkg-reconfigure -f noninteractive tzdata
-RUN /bin/echo -e "LANG=\"en_US.UTF-8\"" > /etc/default/local
+# Set working directory
+WORKDIR /var/www
 
-# install dependencies
-RUN apt-get update
-RUN apt-get install -y --no-install-recommends \
+# Add docker php ext repo
+ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+# Install php extensions
+RUN chmod +x /usr/local/bin/install-php-extensions && sync && \
+    install-php-extensions mbstring pdo_mysql zip exif pcntl gd memcached
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
     build-essential \
-    libfreetype6-dev \
-    libjpeg62-turbo-dev \
-    libjpeg-dev \
-    libmcrypt-dev \
     libpng-dev \
-    libwebp-dev \
-    curl \
-    libcurl4 \
-    libcurl4-openssl-dev \
-    zlib1g-dev \
-    libicu-dev \
-    libmemcached-dev \
-    memcached \
-    default-mysql-client \
-    libmagickwand-dev \
-    unzip \
-    ffmpeg \
-    libzip-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    locales \
     zip \
-    nano;\
-    apt-get clean; rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* /usr/share/doc/*
+    jpegoptim optipng pngquant gifsicle \
+    unzip \
+    git \
+    curl \
+    lua-zlib-dev \
+    libmemcached-dev \
+    ffmpeg
 
+# Install supervisor
+RUN apt-get install -y supervisor
 
-# memcached
-RUN pecl install memcached-3.1.5
-RUN docker-php-ext-enable memcached
+# Install composer
+RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# mcrypt
-RUN pecl install mcrypt-1.0.3
-RUN docker-php-ext-enable mcrypt
+# Clear cache
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# configure, install and enable all php packages
-RUN docker-php-ext-configure gd --with-freetype --with-jpeg=/usr/include/ --enable-gd
-RUN docker-php-ext-install -j$(nproc) gd
+# Add user for laravel application
+RUN groupadd -g 1000 www
+RUN useradd -u 1000 -ms /bin/bash -g www www
 
-RUN docker-php-ext-configure pdo_mysql --with-pdo-mysql=mysqlnd
-RUN docker-php-ext-configure mysqli --with-mysqli=mysqlnd
-RUN docker-php-ext-configure intl
-RUN docker-php-ext-configure zip
+# Copy code to /var/www
+COPY --chown=www:www-data . /var/www
 
-RUN docker-php-ext-install -j$(nproc) opcache
-RUN docker-php-ext-install -j$(nproc) pdo_mysql
-RUN docker-php-ext-install -j$(nproc) mysqli
-RUN docker-php-ext-install -j$(nproc) pdo
-RUN docker-php-ext-install -j$(nproc) intl
-RUN docker-php-ext-install -j$(nproc) zip
-RUN docker-php-ext-install -j$(nproc) bcmath
-RUN pecl install mongodb
+# add root to www group
+RUN chmod -R ug+w /var/www/storage
 
-# install imagick
-RUN pecl install imagick-3.4.4
-RUN docker-php-ext-enable imagick
+# Copy php/supervisor configs
+RUN cp docker/supervisor.conf /etc/supervisord.conf
+RUN cp docker/php.ini /usr/local/etc/php/conf.d/app.ini
 
-# install composer
-RUN cd /tmp \
-    && curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
-# RUN chown -R $USER:$USER /var/www/html
-# RUN chmod -R 777 /var/www/html/storage /var/www/html/bootstrap /var/www/html/public/storage
+# PHP Error Log Files
+RUN mkdir /var/log/php
+RUN touch /var/log/php/errors.log && chmod 777 /var/log/php/errors.log
 
+# Deployment steps
+RUN composer install --optimize-autoloader --no-dev
+RUN chmod +x /var/www/docker/run.sh
 
-# clean image
-RUN apt-get clean
-# RUN chown -R www-data:www-data /var/www/html/vikioneio/storage
-
-EXPOSE 9001
+EXPOSE 80
+ENTRYPOINT ["/var/www/docker/run.sh"]
