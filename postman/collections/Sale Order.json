@@ -1,0 +1,990 @@
+{
+	"info": {
+		"_postman_id": "9dd214a9-cdfd-4347-be85-4d66283fbb0f",
+		"name": "Sale Order",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_uid": "13413489-9dd214a9-cdfd-4347-be85-4d66283fbb0f"
+	},
+	"item": [
+		{
+			"name": "Sale Order",
+			"item": [
+				{
+					"name": "Price List",
+					"id": "03d0dc28-29ae-4fb9-8652-ab807a1799f1",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/sales-order-price/list?channel_code=vl24h",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"sales-order-price",
+								"list"
+							],
+							"query": [
+								{
+									"key": "channel_code",
+									"value": "vl24h"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"id": "8df450b1-9b42-4e80-900e-019856f95f12",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "0071cda4-740c-425a-8133-fbca128fb0db",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "39ca9417-cfd4-4ac1-aba2-e90c4bb9dfe4",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Frontend",
+			"item": [
+				{
+					"name": "Price",
+					"item": [
+						{
+							"name": "Job box price list",
+							"id": "e6cde694-5794-4d3c-ae7b-47dbb3a1f7d9",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{recruiter_token}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{so_url}}/fe/job-box-price-list?gate=vl24h.vlcm&branch=vl24h.south",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"fe",
+										"job-box-price-list"
+									],
+									"query": [
+										{
+											"key": "gate",
+											"value": "vl24h.vlcm"
+										},
+										{
+											"key": "branch",
+											"value": "vl24h.south"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "eacda3bc-2440-4461-882f-883e9fdf93bf"
+				},
+				{
+					"name": "History",
+					"item": [
+						{
+							"name": "List",
+							"id": "719f3ea9-20dc-4985-a4fc-630654ccf6f8",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJjaGFubmVsX2NvZGUiOiJ2bDI0aCIsInVzZXIiOnsiaWQiOiIxMzMxMjU3MTkiLCJlbWFpbCI6InRoaW5obmRnQG5oYW5sdWNzaWV1dmlldC5jb20iLCJuYW1lIjoiTmhcdTAwZTJuIExcdTFlZjFjIFNpXHUwMGVhdSBWaVx1MWVjN3QgKFRlc3QpIiwiYXZhdGFyIjpudWxsLCJoYXNfcGFzcyI6IjJiOGFlOWI1MTA2MzYwYzVlOWE4ZjFkNmE0NjVmZDA4Iiwicm9sZSI6ImVtcGxveWVyIn0sImV4cCI6MTcwMjA5MjQ4Mn0.IycbdrY1NGnrCqkv_BdTEo0WDN8YvmYCtHIFHcl9LJM",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sales_order_status\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/fe/employer/sales-order-history",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"fe",
+										"employer",
+										"sales-order-history"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"id": "250e3070-501c-49ff-9eac-bff7e8b80f40"
+				}
+			],
+			"id": "6ddd0761-b522-4392-b0b7-e0142206b3d2",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "31526a50-ecab-4050-af16-a6c980264c54",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"const options = {",
+							"  url:  pm.environment.get(\"employer_url\") + \"/fe/login\", ",
+							"  method: 'POST',",
+							"  header: {",
+							"    'Accept': '*/*',",
+							"    'Content-Type': 'application/x-www-form-urlencoded',",
+							"    'Authorization': 'Bearer ' + pm.environment.get(\"recruiter_token\")",
+							"  },",
+							"  body: {",
+							"    mode: 'raw',",
+							"    raw: JSON.stringify({",
+							"        step: '2',",
+							"        login_name: 'thinhndg@nhanlucsieuviet.com',",
+							"        password: '123456'",
+							"    })",
+							"  }",
+							"};",
+							"if (pm.request.url.getPath().slice(0,3) !== '/fe') {",
+							"    pm.sendRequest(options, function (err, response) {",
+							"        pm.environment.set(\"token\", response.json().data.token_auth);",
+							"    });",
+							"}",
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "a9ae6280-1672-4157-b9db-514bfbac93c1",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Combo Post",
+			"item": [
+				{
+					"name": "Create",
+					"id": "02b2e13b-c36e-4669-acba-046e8f61bc38",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"TEST\",\r\n    \"description\": \"test\",\r\n    \"ordering\": \"1\",\r\n    \"is_display\": 1,\r\n    \"combo_group\": \"FLEXIBLE\",\r\n    \"status\": 1,\r\n    \"discount_type\": \"PERCENT\",\r\n    \"discount_value\": \"\",\r\n    \"promotion_type\": \"PERCENT\",\r\n    \"promotion_value\": 0,\r\n    \"marketing_type\": \"BEST_SELLER\",\r\n    \"available_from_date\": 1670398275,\r\n    \"available_to_date\": 1970398275,\r\n    \"image_url\": \"abc.png\",\r\n    \"sub_title\": \"Test\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post"
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "318e9679-5f39-46a0-a8d1-bf886a5bef6c",
+							"name": "Create without discount",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"TEST\",\r\n    \"description\": \"test\",\r\n    \"ordering\": \"1\",\r\n    \"is_display\": 1,\r\n    \"combo_group\": \"FLEXIBLE\",\r\n    \"status\": 1,\r\n    \"discount_type\": \"PERCENT\",\r\n    \"discount_value\": \"\",\r\n    \"promotion_type\": \"PERCENT\",\r\n    \"promotion_value\": 0,\r\n    \"marketing_type\": \"BEST_SELLER\",\r\n    \"available_from_date\": 1670398275,\r\n    \"available_to_date\": 1970398275,\r\n    \"image_url\": \"abc.png\",\r\n    \"sub_title\": \"Test\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/combo-post",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"combo-post"
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						},
+						{
+							"id": "a3c03e3b-070a-4ede-9161-834ed72da71b",
+							"name": "Create with discount",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"name\": \"TEST\",\r\n    \"description\": \"test\",\r\n    \"ordering\": \"1\",\r\n    \"is_display\": 1,\r\n    \"combo_group\": \"FLEXIBLE\",\r\n    \"status\": 1,\r\n    \"discount_type\": \"PERCENT\",\r\n    \"discount_value\": \"\",\r\n    \"promotion_type\": \"PERCENT\",\r\n    \"promotion_value\": 0,\r\n    \"marketing_type\": \"BEST_SELLER\",\r\n    \"available_from_date\": 1670398275,\r\n    \"available_to_date\": 1970398275,\r\n    \"image_url\": \"abc.png\",\r\n    \"sub_title\": \"Test\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/combo-post",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"combo-post"
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"id": "e95e5a4e-caaf-49e0-92d1-b6cc17bd460a",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"TEST\",\r\n    \"description\": \"test\",\r\n    \"ordering\": \"1\",\r\n    \"is_display\": 1,\r\n    \"status\": 1,\r\n    \"channel_code\": \"vl24h\",\r\n    \"discount_type\": \"PERCENT\",\r\n    \"discount_value\": \"100\",\r\n    \"promotion_type\": \"PERCENT\",\r\n    \"promotion_value\": 0,\r\n    \"available_from_date\": 1670398275,\r\n    \"available_to_date\": 1670398275,\r\n    \"marketing_type\": \"BEST_SELLER\",\r\n    \"image_url\": \"abc.png\",\r\n    \"sub_title\": \"Test 2\",\r\n    \"combo_group\": \"FLEXIBLE\"\r\n\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "81"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"id": "8ce8463a-73e1-47f8-aed9-b34e20e1e7ab",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":id"
+							],
+							"query": [
+								{
+									"key": "channel_code%3Dvl24h",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "channel_code",
+									"value": "vl24h",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "87"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"id": "3fdf9513-4b1e-4799-a1f6-c48f5b99d3bb",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":id"
+							],
+							"query": [
+								{
+									"key": "channel_code%3Dvl24h",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "channel_code",
+									"value": "vl24h",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "101"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"id": "1ad75c74-58b5-4f14-afee-830e498f1cbb",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post?page=1&per_page=20",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "1"
+								},
+								{
+									"key": "per_page",
+									"value": "20"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch Update",
+					"id": "dceea26f-c0c4-4d51-9691-f739010b0b20",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "81"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "ac9b85dc-d5da-4610-98d1-f201382cb2e6",
+							"name": "Toggle Status",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"status\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/combo-post/:id",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"combo-post",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "81"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			],
+			"id": "f92c5a57-623c-422d-a818-4664ac6ff91f",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "daee7796-c1cd-4654-9746-afa26c505b99",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8f3dba3-fa8f-452f-a68e-07e8e7fe6c74",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Combo Post Item",
+			"item": [
+				{
+					"name": "Create",
+					"id": "06207f57-d433-49e9-80af-3e3a7479fe9b",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"sku_code\": \"JP-G2-P6V21-TVN\",\r\n    \"service_code\": \"tvn.jobbox.trangchu_vieclamhot\",\r\n    \"quantity\": \"1\",\r\n    \"displayed_area\": 3,\r\n    \"displayed_method\": 1,\r\n    \"week_quantity\": \"1\",\r\n    \"type_campaign\": 1,\r\n    \"service_type\": \"jobbox\",\r\n    \"channel_code\": \"tvn\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post/:compo_post_id/item",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":compo_post_id",
+								"item"
+							],
+							"variable": [
+								{
+									"key": "compo_post_id",
+									"value": "126"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "9a00ad4f-57c0-4247-9661-15085f10f179",
+							"name": "Create jobbox item | nationwide",
+							"originalRequest": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"sku_code\": \"JP-G2-P6V21-TVN\",\r\n    \"service_code\": \"tvn.jobbox.trangchu_vieclamhot\",\r\n    \"quantity\": \"1\",\r\n    \"displayed_area\": 3,\r\n    \"displayed_method\": 1,\r\n    \"week_quantity\": \"1\",\r\n    \"type_campaign\": 1,\r\n    \"service_type\": \"jobbox\",\r\n    \"channel_code\": \"tvn\"\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/combo-post/:compo_post_id/item",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"combo-post",
+										":compo_post_id",
+										"item"
+									],
+									"variable": [
+										{
+											"key": "compo_post_id",
+											"value": "126"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				},
+				{
+					"name": "Update",
+					"id": "0a2c47da-e4f6-47c0-951f-249e5456ef6e",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\": \"R\",\r\n    \"ordering\": \"1\",\r\n    \"channel_code\": \"vl24h\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post/:compo_post_id/item/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":compo_post_id",
+								"item",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "compo_post_id",
+									"value": "59"
+								},
+								{
+									"key": "id",
+									"value": "411"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Detail",
+					"id": "34ff9ef6-1db0-4bde-9165-96ac2b7bf825",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post/:compo_post_id/item/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":compo_post_id",
+								"item",
+								":id"
+							],
+							"query": [
+								{
+									"key": "channel_code%3Dvl24h",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "channel_code",
+									"value": "vl24h",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "compo_post_id",
+									"value": "126"
+								},
+								{
+									"key": "id",
+									"value": "414"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"id": "14b1fa84-85c2-4ac6-b380-cb05400d0c55",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post/:compo_post_id/item/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":compo_post_id",
+								"item",
+								":id"
+							],
+							"query": [
+								{
+									"key": "channel_code%3Dvl24h",
+									"value": "",
+									"disabled": true
+								},
+								{
+									"key": "channel_code",
+									"value": "vl24h",
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "compo_post_id",
+									"value": "59"
+								},
+								{
+									"key": "id",
+									"value": "411"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "List",
+					"id": "43de003d-dda6-4618-825a-0a5287ca2b57",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{so_url}}/combo-post/:compo_post_id/item",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":compo_post_id",
+								"item"
+							],
+							"query": [
+								{
+									"key": "service_type",
+									"value": null,
+									"disabled": true
+								}
+							],
+							"variable": [
+								{
+									"key": "compo_post_id",
+									"value": "126"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Patch Update",
+					"id": "e836166e-97cd-4ce4-958e-5106ac6b3e77",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"status\": 1\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{so_url}}/combo-post/:id",
+							"host": [
+								"{{so_url}}"
+							],
+							"path": [
+								"combo-post",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "81"
+								}
+							]
+						}
+					},
+					"response": [
+						{
+							"id": "50f9ae51-97bd-41ba-a23c-c3955041ade4",
+							"name": "Toggle Status",
+							"originalRequest": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"status\": 1\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{so_url}}/combo-post/:id",
+									"host": [
+										"{{so_url}}"
+									],
+									"path": [
+										"combo-post",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "81"
+										}
+									]
+								}
+							},
+							"_postman_previewlanguage": "Text",
+							"header": null,
+							"cookie": [],
+							"body": null
+						}
+					]
+				}
+			],
+			"id": "69d103f9-7a3f-494a-90eb-ce737f4236cd",
+			"auth": {
+				"type": "bearer",
+				"bearer": [
+					{
+						"key": "token",
+						"value": "{{token}}",
+						"type": "string"
+					}
+				]
+			},
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"id": "daee7796-c1cd-4654-9746-afa26c505b99",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"id": "c8f3dba3-fa8f-452f-a68e-07e8e7fe6c74",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "914d9d23-9b82-4411-80da-af7090b4cd68",
+				"type": "text/javascript",
+				"exec": [
+					"",
+					"const options = {",
+					"  url:  pm.environment.get(\"auth_url\") + \"/admin/login\", ",
+					"  method: 'POST',",
+					"  header: {",
+					"    'Accept': '*/*',",
+					"    'Content-Type': 'application/x-www-form-urlencoded',",
+					"  },",
+					"  body: {",
+					"    mode: 'raw',",
+					"    raw: JSON.stringify({",
+					"        step: '2',",
+					"        login_name: 'admin@timviecnhanh.com',",
+					"        password: 'welcome112020'",
+					"    })",
+					"  }",
+					"};",
+					"if (pm.request.url.getPath().slice(0,3) !== '/fe') {",
+					"    pm.sendRequest(options, function (err, response) {",
+					"        pm.environment.set(\"token\", response.json().data.token_auth);",
+					"    });",
+					"}",
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "6dab83c6-5c95-47de-a140-411a62ad1c92",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
